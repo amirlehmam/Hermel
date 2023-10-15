@@ -1,3 +1,6 @@
+# Installer Django
+pip install django
+
 # Créer un nouveau projet
 django-admin startproject Hermel
 

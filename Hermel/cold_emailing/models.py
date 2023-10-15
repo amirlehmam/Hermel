@@ -37,3 +37,4 @@ class Contact(models.Model):
 class CampaignContact(models.Model):
     campaign = models.ForeignKey(Campaign, related_name='campaign_contacts', on_delete=models.CASCADE)
     contact = models.ForeignKey(Contact, related_name='campaign_contacts', on_delete=models.CASCADE)
+    

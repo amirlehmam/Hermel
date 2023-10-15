@@ -1,7 +1,8 @@
 # cold_emailing/serializers.py
 
 from rest_framework import serializers
-from .models import User, Campaign, Email, Contact, CampaignContact
+from cold_emailing.models import User, Campaign, Email, Contact, CampaignContact
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
