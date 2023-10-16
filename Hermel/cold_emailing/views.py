@@ -3,13 +3,25 @@ from django.shortcuts import render
 # cold_emailing/views.py
 
 from django.http import HttpResponse
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.response import Response
 from .models import User, Campaign, Email, Contact, CampaignContact
 from .serializers import UserSerializer, CampaignSerializer, EmailSerializer, ContactSerializer, CampaignContactSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            # Hash the password before saving
+            password = request.data.get('password_hash')
+            hashed_password = some_hash_function(password)
+            serializer.validated_data['password_hash'] = hashed_password
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CampaignViewSet(viewsets.ModelViewSet):
     queryset = Campaign.objects.all()
