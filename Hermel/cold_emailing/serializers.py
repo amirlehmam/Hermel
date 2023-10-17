@@ -1,7 +1,7 @@
 # cold_emailing/serializers.py
 
 from rest_framework import serializers
-from cold_emailing.models import User, Campaign, Email, Contact, CampaignContact
+from cold_emailing.models import User, Campaign, Email, Contact, CampaignContact, EmailSettings
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -18,6 +18,11 @@ class EmailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Email
         fields = '__all__'
+        
+class EmailSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmailSettings
+        fields = '__all__'
 
 class ContactSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,3 +33,5 @@ class CampaignContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = CampaignContact
         fields = '__all__'
+        
+        

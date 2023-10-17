@@ -22,6 +22,15 @@ class Email(models.Model):
     campaign = models.ForeignKey(Campaign, related_name='emails', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+class EmailSettings(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    smtp_server = models.CharField(max_length=255)
+    smtp_port = models.IntegerField()
+    imap_server = models.CharField(max_length=255)
+    imap_port = models.IntegerField()
+    email = models.EmailField()
+    password = models.CharField(max_length=128)  # Utilisez un champ sécurisé dans la production
 
 # Contacts Model
 class Contact(models.Model):

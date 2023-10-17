@@ -10,6 +10,7 @@ router.register(r'campaigns', views.CampaignViewSet)
 router.register(r'emails', views.EmailViewSet)
 router.register(r'contacts', views.ContactViewSet)
 router.register(r'campaign_contacts', views.CampaignContactViewSet)
+router.register(r'email_settings', views.EmailSettingsViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

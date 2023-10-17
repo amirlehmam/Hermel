@@ -11,6 +11,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from django.urls import get_resolver
 from django.shortcuts import render
+from rest_framework.decorators import action
 
 def home_view(request):
     url_patterns = get_resolver().reverse_dict.keys()
@@ -23,8 +24,6 @@ def home_view(request):
         'readable_urls': filtered_urls,
     }
     return render(request, 'home.html', context)
-
-
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -48,6 +47,34 @@ class CampaignViewSet(viewsets.ModelViewSet):
 class EmailViewSet(viewsets.ModelViewSet):
     queryset = Email.objects.all()
     serializer_class = EmailSerializer
+    
+from django.core.mail import EmailMessage
+from .models import EmailSettings
+from .serializers import EmailSettingsSerializer
+from rest_framework.decorators import api_view
+
+class EmailSettingsViewSet(viewsets.ModelViewSet):
+    queryset = EmailSettings.objects.all()
+    serializer_class = EmailSettingsSerializer
+
+
+@api_view(['POST'])
+def send_email(request):
+    try:
+        email_settings = EmailSettings.objects.get(user=request.user)
+    except EmailSettings.DoesNotExist:
+        return Response({"error": "Email settings not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    email = EmailMessage(
+        subject=request.data.get("subject"),
+        body=request.data.get("body"),
+        from_email=email_settings.email,
+        to=[request.data.get("to_email")],
+    )
+    email.send()
+
+    return Response({"message": "Email sent successfully"}, status=status.HTTP_200_OK)
+
 
 class ContactViewSet(viewsets.ModelViewSet):
     queryset = Contact.objects.all()
