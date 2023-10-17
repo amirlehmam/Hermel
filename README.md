@@ -58,40 +58,41 @@
 
 1. **Clonez le dépôt**
 
-\`\`\`bash
+``bash
 git clone https://github.com/notsmart-af/Hermel.git
-\`\`\`
+``
 
 2. **Installez les dépendances du backend**
 
-\`\`\`bash
+``bash
 cd Hermel
 pip install -r requirements.txt
-\`\`\`
+``
 
 3. **Installez les dépendances du frontend**
 
-\`\`\`bash
+``bash
 cd frontend
 npm install
-\`\`\`
+``
 
-4. **Lancez les serveurs**
+4. **Lancez les serveurs backend**
 
-\`\`\`bash
-# Backend
+``bash
 python manage.py runserver
+``
 
 # Frontend
-cd frontend
+
+``cd frontend
 npm start
-\`\`\`
+``
 
 ---
 
 ## Utilisation
 
-Pour créer un nouvel utilisateur, accédez à \`http://localhost:3000/signup\`.
+Pour créer un nouvel utilisateur, accédez à ``http://localhost:3000/signup\``.
 
 ---
 
