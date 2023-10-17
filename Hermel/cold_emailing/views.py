@@ -7,6 +7,10 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from .models import User, Campaign, Email, Contact, CampaignContact
 from .serializers import UserSerializer, CampaignSerializer, EmailSerializer, ContactSerializer, CampaignContactSerializer
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password
+from rest_framework import viewsets, status
+from rest_framework.response import Response
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -15,9 +19,9 @@ class UserViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            # Hash the password before saving
+            # Hasher le mot de passe avant de l'enregistrer
             password = request.data.get('password_hash')
-            hashed_password = some_hash_function(password)
+            hashed_password = make_password(password)  # Utilisation du hachage de mot de passe de Django
             serializer.validated_data['password_hash'] = hashed_password
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
