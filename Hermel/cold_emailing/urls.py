@@ -18,3 +18,4 @@ urlpatterns = [
     path('', include(router.urls)),
     path('email_interface/', EmailInterfaceView.as_view(), name='Send Mail'),
 ]
+#sss
