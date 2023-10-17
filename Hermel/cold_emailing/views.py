@@ -91,36 +91,37 @@ class EmailSettingsViewSet(viewsets.ModelViewSet):
     queryset = EmailSettings.objects.all()
     serializer_class = EmailSettingsSerializer
 
+from django.shortcuts import get_object_or_404
+
 class EmailInterfaceView(APIView):
-    
+
+    def get_user(self):
+        # Si "sdd" est un nom d'utilisateur, récupérez l'objet User correspondant.
+        user = get_object_or_404(User, username='sdd')
+        return user
+
     def get(self, request, format=None):
-        
-        try:
-            email_settings = EmailSettings.objects.get(user=request.user)
-        except EmailSettings.DoesNotExist:
-             return Response({"error": "Email settings not found for the user"}, status=status.HTTP_404_NOT_FOUND)
-        if not request.user.is_authenticated:
-            return Response({"error": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
-        if request.user.is_superuser:
-            return Response({"message": "You are an admin. Please use a regular user account."}, status=status.HTTP_400_BAD_REQUEST)
+        user = self.get_user()  # Récupère l'utilisateur
 
         try:
-            email_settings = EmailSettings.objects.get(user=request.user)
+            email_settings = EmailSettings.objects.get(user=user)
             serializer = EmailSettingsSerializer(email_settings)
             return Response({"email_settings": serializer.data}, status=status.HTTP_200_OK)
         except EmailSettings.DoesNotExist:
-            return Response({"error": "Email settings not found"}, status=status.HTTP_404_NOT_FOUND)
-    
+            return Response({"error": "Email settings not found for the user"}, status=status.HTTP_404_NOT_FOUND)
+
     def post(self, request, format=None):
+        user = self.get_user()  # Récupère l'utilisateur
+
         try:
-            email_settings = EmailSettings.objects.get(user=request.user)
+            email_settings = EmailSettings.objects.get(user=user)
         except EmailSettings.DoesNotExist:
             return Response({"error": "Email settings not found"}, status=status.HTTP_404_NOT_FOUND)
-        
+
         subject = request.data.get("subject")
         body = request.data.get("body")
         to_email = request.data.get("to_email")
-        
+
         email = EmailMessage(
             subject=subject,
             body=body,
@@ -128,7 +129,7 @@ class EmailInterfaceView(APIView):
             to=[to_email],
         )
         email.send()
-        
+
         return Response({"message": "Email sent successfully"}, status=status.HTTP_200_OK)
 
 
