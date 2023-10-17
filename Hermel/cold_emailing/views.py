@@ -1,17 +1,56 @@
 # cold_emailing/views.py
 
 from django.http import HttpResponse
+from django.shortcuts import render
+from rest_framework.decorators import api_view
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .models import User, Campaign, Email, Contact, CampaignContact
-from .serializers import UserSerializer, CampaignSerializer, EmailSerializer, ContactSerializer, CampaignContactSerializer
-from django.contrib.auth.hashers import make_password
+from .models import User, Campaign, Email, Contact, CampaignContact, EmailSettings
+from .serializers import UserSerializer, CampaignSerializer, EmailSerializer, ContactSerializer, CampaignContactSerializer, EmailSettingsSerializer
 from django.contrib.auth.hashers import make_password
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from django.urls import get_resolver
 from django.shortcuts import render
 from rest_framework.decorators import action
+from rest_framework.views import APIView
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
+from .forms import LoginForm
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.core.mail import EmailMessage
+from .models import EmailSettings
+from .serializers import EmailSettingsSerializer
+from rest_framework.decorators import api_view
+
+
+def login_view(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
+            if user is not None:
+                login(request, user)
+                return redirect('home_view')  # Redirige vers la vue d'accueil
+    else:
+        form = LoginForm()
+    return render(request, 'login.html', {'form': form})
+
+@login_required
+def login_view(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
+            if user is not None:
+                login(request, user)
+                # Rediriger vers /api/email_interface/ avec l'ID de l'utilisateur
+                return HttpResponseRedirect(reverse('email_interface_view', args=[user.id]))
+    else:
+        form = LoginForm()
+    return render(request, 'login.html', {'form': form})
 
 def home_view(request):
     url_patterns = get_resolver().reverse_dict.keys()
@@ -48,14 +87,49 @@ class EmailViewSet(viewsets.ModelViewSet):
     queryset = Email.objects.all()
     serializer_class = EmailSerializer
     
-from django.core.mail import EmailMessage
-from .models import EmailSettings
-from .serializers import EmailSettingsSerializer
-from rest_framework.decorators import api_view
-
 class EmailSettingsViewSet(viewsets.ModelViewSet):
     queryset = EmailSettings.objects.all()
     serializer_class = EmailSettingsSerializer
+
+class EmailInterfaceView(APIView):
+    
+    def get(self, request, format=None):
+        
+        try:
+            email_settings = EmailSettings.objects.get(user=request.user)
+        except EmailSettings.DoesNotExist:
+             return Response({"error": "Email settings not found for the user"}, status=status.HTTP_404_NOT_FOUND)
+        if not request.user.is_authenticated:
+            return Response({"error": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
+        if request.user.is_superuser:
+            return Response({"message": "You are an admin. Please use a regular user account."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            email_settings = EmailSettings.objects.get(user=request.user)
+            serializer = EmailSettingsSerializer(email_settings)
+            return Response({"email_settings": serializer.data}, status=status.HTTP_200_OK)
+        except EmailSettings.DoesNotExist:
+            return Response({"error": "Email settings not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    def post(self, request, format=None):
+        try:
+            email_settings = EmailSettings.objects.get(user=request.user)
+        except EmailSettings.DoesNotExist:
+            return Response({"error": "Email settings not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        subject = request.data.get("subject")
+        body = request.data.get("body")
+        to_email = request.data.get("to_email")
+        
+        email = EmailMessage(
+            subject=subject,
+            body=body,
+            from_email=email_settings.email,
+            to=[to_email],
+        )
+        email.send()
+        
+        return Response({"message": "Email sent successfully"}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
