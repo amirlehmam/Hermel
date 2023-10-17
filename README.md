@@ -58,9 +58,9 @@
 
 1. **Clonez le dépôt**
 
-\`\`\`bash
+`\``bash
 git clone https://github.com/notsmart-af/Hermel.git
-\`\`\`
+\``\`
 
 2. **Installez les dépendances du backend**
 
