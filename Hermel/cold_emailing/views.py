@@ -1,5 +1,3 @@
-from django.shortcuts import render
-
 # cold_emailing/views.py
 
 from django.http import HttpResponse
@@ -11,6 +9,22 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.hashers import make_password
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+from django.urls import get_resolver
+from django.shortcuts import render
+
+def home_view(request):
+    url_patterns = get_resolver().reverse_dict.keys()
+    readable_urls = [str(pattern) for pattern in url_patterns if isinstance(pattern, str)]
+    
+    # Filtrer les URL qui ne nécessitent pas d'arguments
+    filtered_urls = [url for url in readable_urls if 'detail' not in url]
+    
+    context = {
+        'readable_urls': filtered_urls,
+    }
+    return render(request, 'home.html', context)
+
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -42,41 +56,3 @@ class ContactViewSet(viewsets.ModelViewSet):
 class CampaignContactViewSet(viewsets.ModelViewSet):
     queryset = CampaignContact.objects.all()
     serializer_class = CampaignContactSerializer
-
-from django.http import HttpResponse
-
-def home(request):
-    return HttpResponse("""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Bienvenue sur Hermel</title>
-        </head>
-        <body>
-            <h1>Bienvenue sur la plateforme Hermel !</h1>
-            <p>
-                Nous sommes ravis de vous annoncer le développement de Hermel, 
-                votre solution ultime pour le cold emailing.
-            </p>
-            <p>
-                Parmi les fonctionnalités prévues, vous trouverez :
-            </p>
-            <ul>
-                <li>SpinText IA pour la personnalisation des e-mails</li>
-                <li>Intégration avec divers CRM</li>
-                <li>Séquençage des e-mails</li>
-                <li>Pixels pour le suivi des e-mails</li>
-                <li>Fonctionnalités de Warm-up pour les adresses e-mail</li>
-                <li>Dashboard pour le scoring des campagnes d'emailing</li>
-            </ul>
-            <p>
-                Nous sommes en phase finale de développement et prévoyons d'être 
-                opérationnels dans un mois.
-            </p>
-            <p>
-                Restez à l'écoute pour les mises à jour !
-            </p>
-        </body>
-        </html>
-    """)
-

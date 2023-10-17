@@ -21,5 +21,5 @@ from cold_emailing import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('cold_emailing.urls')),
-    path('', views.home, name='home'),
+    path('', views.home_view, name='home'),
 ]

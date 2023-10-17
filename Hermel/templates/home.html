@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bienvenue sur Hermel</title>
+</head>
+<body>
+    <h2>URLs disponibles :</h2>
+    <ul>
+        {% for url in readable_urls %}
+            <li><a href="{% url url %}">{{ url }}</a></li>
+        {% endfor %}
+    </ul>
+    <h1>Bienvenue sur la plateforme Hermel !</h1>
+    <p>
+        Nous sommes ravis de vous annoncer le développement de Hermel, 
+        votre solution ultime pour le cold emailing.
+    </p>
+    <p>
+        Parmi les fonctionnalités prévues, vous trouverez :
+    </p>
+    <ul>
+        <li>SpinText IA pour la personnalisation des e-mails</li>
+        <li>Intégration avec divers CRM</li>
+        <li>Séquençage des e-mails</li>
+        <li>Pixels pour le suivi des e-mails</li>
+        <li>Fonctionnalités de Warm-up pour les adresses e-mail</li>
+        <li>Dashboard pour le scoring des campagnes d'emailing</li>
+    </ul>
+    <p>
+        Nous sommes en phase finale de développement et prévoyons d'être 
+        opérationnels dans un mois.
+    </p>
+    <p>
+        Restez à l'écoute pour les mises à jour !
+    </p>
+
+</body>
+</html>
